@@ -1,0 +1,133 @@
+These are the specimen answers for the given questions.
+
+1. Find the second highest salary in each department?
+
+	SELECT e.salary, e.name, e.employee_id, e.department_id, d.department_name FROM employees e
+	LEFT JOIN departments d on employees e WHERE d.department_id IS NOT NULL
+	GROUP BY d.department_name ORDER BY e.employee_id, d.department_name DESC LIMIT 1, 1
+
+2. Calculate the difference in sales between each employee's current sale 
+and their previous sale?
+	
+	SELECT ABS(SUB(s.amount, (SELECT ss.amount FROM sales ss WHERE ss.sale_date = DATE_DIFF(ss.sale_date, TODAY)))) 
+	FROM sales s
+	WHERE s.sale_date = TODAY;
+
+3. Retrieve the average salary of employees in each department and 
+the difference of each employee's salary from the department's average salary?
+
+	SELECT AVG(e.salary), ABS(AVG(e.salary) - e.salary), e.department_id, d.department_name FROM employees e
+	LEFT JOIN departments d on employees e WHERE d.department_id IS NOT NULL
+	GROUP BY d.department_name ORDER BY e.employee_id, d.department_name DESC
+
+4. Find the cumulative percentage of total sales amount for each employee?
+	--
+
+
+5. Retrieve the top 3 most expensive products in each category?
+
+	SELECT p.price, p.product_name, p.category FROM products p
+	WHERE p.category IS NOT NULL
+	GROUP BY p.category ORDER BY p.price DESC LIMIT 2, 1
+
+
+6. Calculate the year-to-date (YTD) sales for each employee.
+	
+
+
+7. Retrieve the sales of each employee as a percentage of the total sales 
+in their department.
+
+
+
+8. Retrieve the name and total sales amount for the employee with 
+the second highest total sales.
+
+
+
+9. Find the average sales amount per employee for each department, 
+including departments with no sales.
+
+	SELECT e.name, e.employee_id, AVG(s.amount), e.department_id, d.department_name FROM employees e
+	LEFT JOIN sales s on employees e WHERE e.employee_id = s.employee_id
+	LEFT JOIN departments d on employees e WHERE d.department_id IS NOT NULL
+	WHERE s.amount = NULL OR s.amount = 0 
+	GROUP BY d.department_name ORDER BY s.amount, e.employee_id DESC;
+
+10. Retrieve the names of employees who have the highest sale amount in each department?
+
+	SELECT e.name, e.employee_id, s.amount, e.department_id, d.department_name FROM employees e
+	LEFT JOIN sales s on employees e WHERE e.employee_id = s.employee_id
+	LEFT JOIN departments d on employees e WHERE d.department_id IS NOT NULL
+	GROUP BY d.department_name ORDER BY s.amount, e.employee_id DESC;
+
+
+11. Identify the customers who have not placed any orders in the last 6 months.
+
+	SELECT c.name, c.customer_id, o.order_id FROM orders o
+	LEFT JOIN customers c on orders o WHERE c.customer_id = o.customer_id
+	WHERE o.order_date BETWEEN TODAY AND DATEDIFF(TODAY, '6 months');
+
+
+12. List customers who have placed more orders than the average number of orders per customer?
+
+	SELECT c.name, c.customer_id, o.order_id,  FROM orders o
+	RIGHT JOIN customers c on orders o WHERE c.customer_id = o.customer_id
+	WHERE sum(o.order_id) <= avg(sum(o.order_id));
+
+
+13. Find the names of employees who have not sold any products in the "Electronics" category?
+
+	I don't see relation between 'products' and 'sales' tables to connect with employees table.
+
+
+
+
+--
+14. Write a single query using below mentioned tables to fetch list of samples?
+
+
+	Single query to fetch the data as per the specimen data using given table.
+	Query for the 'data':
+
+            "sample_id": "1",
+            "sample_name": "Whole Blood",
+            "tests": [
+                {
+                    "test_id": 1,
+                    "test_name": "Toxicology Tests",
+                    "child_tests": [
+                        {
+                            "test_id": 2,
+                            "test_name": "Heavy Metal Testing",
+                        },
+                        {
+                            "test_id": 3,
+                            "test_name": "Drug Screening",
+                        },
+                        {
+                            "test_id": 4,
+                            "test_name": "Pesticide Residue Analysis",
+                        }
+                    ],
+                },
+		...
+		...
+		],
+
+	--
+	parent table - antz_medical_tests
+	child table - antz_master_samples_types
+	child table - antz_sample_test_mapping
+	--
+
+
+	SELECT amt.sample_id, amt.sample_name, amt.parent_test_id, amt.parent_test_name, astm.test_id, astm.test_name
+	FROM antz_medical_tests amt
+	LEFT JOIN antz_sample_test_mapping astm ON antz_medical_tests amt
+	WHERE amt.sample_id = astm.sample_id 
+	GROUP BY amt.sample_id, amt.parent_test_id, astm.test_id
+	ORDER BY amt.sample_id, amt.parent_test_id, astm.test_id;
+
+
+--
